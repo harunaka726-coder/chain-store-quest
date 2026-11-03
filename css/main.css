@@ -632,10 +632,17 @@ html, body {
   border: 1px dashed rgba(59, 130, 246, 0.35);
   background: rgba(255, 255, 255, 0.55);
   min-height: 56px;
+  max-height: 90px;
   display: grid;
   place-items: center;
   position: relative;
   overflow: hidden;
+}
+.ad-slot iframe,
+.ad-slot ins,
+.ad-slot .adsbygoogle {
+  max-width: 100% !important;
+  max-height: 90px !important;
 }
 .ad-label {
   position: absolute;
@@ -966,14 +973,20 @@ html, body {
     border-radius: 14px;
   }
   .ad-slot {
-    min-height: 0;
+    height: 50px;
+    min-height: 50px;
     max-height: 50px;
     border: none;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.35);
     border-radius: 8px;
+    overflow: hidden;
   }
+  .ad-slot iframe,
+  .ad-slot ins,
   .ad-slot .adsbygoogle {
     display: block !important;
+    width: 100% !important;
+    height: 50px !important;
     min-height: 0 !important;
     max-height: 50px !important;
     overflow: hidden !important;
@@ -983,6 +996,7 @@ html, body {
     left: 6px;
     font-size: 0.55rem;
     opacity: 0.7;
+    z-index: 1;
   }
   .footer-nav {
     font-size: 0.7rem;

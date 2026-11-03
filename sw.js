@@ -1,5 +1,5 @@
-/* チェーン店クエスト — lightweight app shell cache */
-const CACHE = "csq-shell-v1";
+/* チェーン店クエスト — network-first shell so deploys show up quickly */
+const CACHE = "csq-shell-v2";
 const SHELL = [
   "./",
   "./index.html",
@@ -45,18 +45,35 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
+  // HTML / CSS / JS: network first so ad layout and UI updates aren't stuck
+  const networkFirst = req.mode === "navigate" || /\.(html|css|js|webmanifest)$/i.test(url.pathname);
+
+  if (networkFirst) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => undefined);
+          }
+          return res;
+        })
+        .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(req).then((cached) => {
       const network = fetch(req)
         .then((res) => {
-          if (res && res.ok && url.pathname.match(/\.(html|css|js|webmanifest|png|svg)$/)) {
+          if (res && res.ok) {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => undefined);
           }
           return res;
         })
         .catch(() => cached);
-
       return cached || network;
     })
   );
