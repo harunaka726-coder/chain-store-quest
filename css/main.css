@@ -952,59 +952,55 @@ html, body {
   .fab-bar {
     left: 12px;
     right: 12px;
-    bottom: 92px;
+    bottom: 58px;
     transform: none;
     max-width: none;
     justify-content: flex-start;
   }
   .panel {
-    top: auto; left: 12px; right: 12px; bottom: 92px;
+    top: auto; left: 12px; right: 12px; bottom: 58px;
     width: auto; max-height: 36vh;
   }
   .panel.is-collapsed { transform: translateY(calc(100% + 24px)); }
   .panel-toggle { display: grid; right: 12px; }
+  /* スマホは広告ユニットを出さず、リンクだけの細いフッターにする */
   .site-footer {
     left: 12px;
     right: 12px;
     bottom: 10px;
     max-width: none;
-    padding: 6px 10px;
-    gap: 4px;
+    max-height: 44px;
+    padding: 8px 12px;
+    gap: 0;
     border-radius: 14px;
-  }
-  .ad-slot {
-    height: 50px;
-    min-height: 50px;
-    max-height: 50px;
-    border: none;
-    background: rgba(255, 255, 255, 0.35);
-    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     overflow: hidden;
   }
-  .ad-slot iframe,
-  .ad-slot ins,
-  .ad-slot .adsbygoogle {
-    display: block !important;
-    width: 100% !important;
-    height: 50px !important;
+  .ad-slot {
+    display: none !important;
+    height: 0 !important;
     min-height: 0 !important;
-    max-height: 50px !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
     overflow: hidden !important;
-  }
-  .ad-label {
-    top: 2px;
-    left: 6px;
-    font-size: 0.55rem;
-    opacity: 0.7;
-    z-index: 1;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
   .footer-nav {
-    font-size: 0.7rem;
-    gap: 6px 12px;
+    font-size: 0.68rem;
+    gap: 6px 10px;
+    flex: 1;
+    min-width: 0;
   }
   .footer-copy {
     margin: 0;
-    font-size: 0.62rem;
+    font-size: 0.58rem;
+    white-space: nowrap;
   }
-  .toast { bottom: 78px; }
+  .toast { bottom: 56px; }
 }

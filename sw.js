@@ -1,5 +1,5 @@
 /* チェーン店クエスト — network-first shell so deploys show up quickly */
-const CACHE = "csq-shell-v2";
+const CACHE = "csq-shell-v3";
 const SHELL = [
   "./",
   "./index.html",
