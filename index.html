@@ -2,9 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>チェーン店クエスト</title>
   <meta name="description" content="地図上のチェーン店をつないで遊ぶ Web アプリ" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="チェーン店クエスト" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HX2RY60ZX7"></script>
   <script>
@@ -175,11 +184,11 @@
     <footer class="site-footer glass-panel">
       <div class="ad-slot" id="ad-slot" aria-label="広告枠">
         <span class="ad-label">広告</span>
-        <!-- AdSense 審査後、管理画面の広告ユニットコードに差し替え可能 -->
+        <!-- スマホは横長バナー想定。審査後はユニット ID に差し替え可 -->
         <ins class="adsbygoogle"
-             style="display:block; min-height:56px; width:100%"
+             style="display:block; width:100%; min-height:50px"
              data-ad-client="ca-pub-1596742811536787"
-             data-ad-format="auto"
+             data-ad-format="horizontal"
              data-full-width-responsive="true"></ins>
         <script>
           (adsbygoogle = window.adsbygoogle || []).push({});
@@ -199,5 +208,12 @@
   <script src="js/overpass.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
