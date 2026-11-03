@@ -258,11 +258,14 @@
     return L.divIcon({
       className: "",
       html: `<div class="${classes.join(" ")}" style="--brand:${brand.color}">
-        <span class="pin-ring"></span><span class="pin-core"></span>
+        <span class="pin-glow"></span>
+        <span class="pin-ring"></span>
+        <span class="pin-core"></span>
+        <span class="pin-label">${escapeHtml(brand.shortName)}</span>
       </div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
-      popupAnchor: [0, -14]
+      iconSize: [64, 64],
+      iconAnchor: [32, 32],
+      popupAnchor: [0, -26]
     });
   }
 
@@ -409,7 +412,7 @@
   let edgeRefs = [];
 
   function drawOnePath(ids, closed, options = {}) {
-    const { flash = false, weight = 3.5, fillOpacity = 0.2 } = options;
+    const { flash = false, weight = 5, fillOpacity = 0.18, showDist = true } = options;
     for (let i = 0; i < ids.length - 1; i++) {
       const a = getStore(ids[i]);
       const b = getStore(ids[i + 1]);
@@ -425,7 +428,7 @@
         className: "neon-edge",
         color: brandA.color,
         weight,
-        opacity: 0.95,
+        opacity: 0.98,
         interactive: false,
         renderer: svgRenderer
       });
@@ -444,6 +447,21 @@
         b: L.latLng(b.lat, b.lng),
         layer: poly
       });
+
+      if (showDist) {
+        const mid = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2);
+        const meters = haversineMeters(a, b);
+        L.marker(mid, {
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: "",
+            html: `<div class="edge-dist-label">${formatDistance(meters)}</div>`,
+            iconSize: [72, 20],
+            iconAnchor: [36, 10]
+          })
+        }).addTo(edgeLayer);
+      }
     }
 
     const unique = closed ? ids.slice(0, -1) : ids;
@@ -484,12 +502,13 @@
     gradientSeq = 0;
 
     savedRoutes.forEach((c) => {
-      drawOnePath(c.pathIds, true, { flash: false, weight: 3, fillOpacity: 0.16 });
+      drawOnePath(c.pathIds, true, { flash: false, weight: 4, fillOpacity: 0.14, showDist: false });
     });
     drawOnePath(pathIds, isClosed, {
       flash: !!options.flash && isClosed,
-      weight: 3.5,
-      fillOpacity: 0.22
+      weight: 5.5,
+      fillOpacity: 0.18,
+      showDist: true
     });
 
     map.off("zoom move", syncGradients);
@@ -812,7 +831,9 @@
       .map((b) => {
         const active = activeBrands.has(b.id);
         return `<button type="button" class="brand-chip${active ? " is-active" : ""}" data-brand="${b.id}" style="--brand:${b.color}" aria-pressed="${active}">
-          <span class="chip-dot" aria-hidden="true"></span>${b.name}
+          <span class="chip-dot" aria-hidden="true"></span>
+          <span>${escapeHtml(b.name)}</span>
+          <span class="chip-check" aria-hidden="true">✓</span>
         </button>`;
       })
       .join("");
@@ -1116,7 +1137,8 @@
       {
         attribution:
           'Tiles &copy; Esri — Data &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-        maxZoom: 16
+        maxZoom: 16,
+        className: "map-tiles-soft"
       }
     ).addTo(map);
 
