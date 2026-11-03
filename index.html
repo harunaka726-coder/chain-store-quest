@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>チェーン店クエスト</title>
+  <meta name="description" content="地図上のチェーン店をつないで遊ぶ Web アプリ" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <div id="skeleton" class="skeleton" aria-hidden="true">
+    <div class="skeleton-glass">
+      <div class="sk-bar sk-logo shimmer"></div>
+      <div class="sk-search shimmer"></div>
+      <div class="sk-panel">
+        <div class="sk-line shimmer"></div>
+        <div class="sk-line short shimmer"></div>
+        <div class="sk-chips">
+          <span class="sk-chip shimmer"></span>
+          <span class="sk-chip shimmer"></span>
+          <span class="sk-chip shimmer"></span>
+          <span class="sk-chip shimmer"></span>
+        </div>
+        <div class="sk-block shimmer"></div>
+        <div class="sk-block shimmer"></div>
+        <div class="sk-block short shimmer"></div>
+      </div>
+    </div>
+    <div class="skeleton-map-grid" aria-hidden="true"></div>
+  </div>
+
+  <div id="app" class="app is-booting">
+    <div id="map" role="application" aria-label="マップ"></div>
+    <div class="glass-veil" aria-hidden="true"></div>
+
+    <header class="glass-pill brand-bar anim-enter" style="--d:0s">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="26" height="26">
+          <circle cx="12" cy="14" r="3" fill="currentColor"/>
+          <circle cx="28" cy="16" r="3" fill="currentColor"/>
+          <circle cx="20" cy="28" r="3" fill="currentColor"/>
+          <path d="M12 14 L28 16 L20 28 Z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+      </div>
+      <h1>チェーン店クエスト</h1>
+    </header>
+
+    <div class="search-bar anim-enter" id="search-bar" style="--d:.06s">
+      <form id="search-form" class="glass-card search-form" autocomplete="off">
+        <label class="sr-only" for="search-input">場所検索</label>
+        <input type="search" id="search-input" placeholder="場所を検索" enterkeyhint="search" />
+        <button type="submit" class="btn btn-primary">検索</button>
+      </form>
+      <ul class="search-results glass-card" id="search-results" hidden role="listbox"></ul>
+    </div>
+
+    <aside class="panel glass-panel anim-enter" id="control-panel" style="--d:.12s">
+      <section class="panel-section">
+        <h2>データ</h2>
+        <button type="button" id="btn-fetch-stores" class="btn btn-primary btn-block">このエリアの店舗を取得</button>
+        <p class="meta" id="data-status">未取得</p>
+      </section>
+
+      <section class="panel-section">
+        <h2>チェーン</h2>
+        <div class="brand-filters" id="brand-filters" role="group"></div>
+        <div class="btn-row">
+          <button type="button" id="btn-brands-all" class="btn btn-ghost">すべて</button>
+          <button type="button" id="btn-brands-none" class="btn btn-ghost">なし</button>
+        </div>
+        <p class="meta" id="filter-count">表示中: —</p>
+
+        <div class="add-brand glass-inset">
+          <h3>チェーンを追加</h3>
+          <form id="add-brand-form" class="add-brand-form">
+            <input type="text" id="add-brand-name" placeholder="例: すき家" required maxlength="40" />
+            <input type="color" id="add-brand-color" value="#ff6b4a" title="カラー" />
+            <button type="submit" class="btn btn-primary">追加</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2>半径</h2>
+        <div class="field-row">
+          <input type="number" id="radius-input" min="50" max="5000" step="50" value="300" />
+          <span class="field-suffix">m</span>
+        </div>
+        <label class="check-row">
+          <input type="checkbox" id="chk-radius" checked />
+          選択店舗に円を表示
+        </label>
+      </section>
+
+      <section class="panel-section">
+        <h2>範囲集計</h2>
+        <div class="btn-row">
+          <button type="button" id="btn-select-rect" class="btn btn-ghost">四角形</button>
+          <button type="button" id="btn-select-circle" class="btn btn-ghost">円</button>
+        </div>
+        <button type="button" id="btn-select-clear" class="btn btn-ghost btn-block">範囲解除</button>
+        <p class="mode-label" id="select-mode-label" hidden></p>
+        <div class="area-report" id="area-report" hidden>
+          <p class="area-total" id="area-total">合計 0 店</p>
+          <ul class="area-brand-summary" id="area-brand-summary"></ul>
+          <details class="area-details">
+            <summary>店舗リスト</summary>
+            <ul class="area-store-list" id="area-store-list"></ul>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2>描画</h2>
+        <div class="btn-row">
+          <button type="button" id="btn-clear" class="btn btn-ghost">現在をクリア</button>
+          <button type="button" id="btn-auto" class="btn btn-primary">自動結線</button>
+        </div>
+        <button type="button" id="btn-clear-all" class="btn btn-ghost btn-block">すべて消去</button>
+        <button type="button" id="btn-next" class="btn btn-ghost btn-block" hidden>次のルート</button>
+      </section>
+
+      <section class="panel-section">
+        <h2>情報</h2>
+        <dl class="stats">
+          <div><dt>頂点</dt><dd id="stat-vertices">0</dd></div>
+          <div><dt>線</dt><dd id="stat-edges">0</dd></div>
+          <div><dt>直前の距離</dt><dd id="stat-last-dist">—</dd></div>
+          <div><dt>合計距離</dt><dd id="stat-total-dist">—</dd></div>
+          <div><dt>面積</dt><dd id="stat-area">—</dd></div>
+          <div><dt>状態</dt><dd id="stat-closed">未完成</dd></div>
+          <div><dt>保存数</dt><dd id="stat-saved">0</dd></div>
+        </dl>
+        <ul class="edge-dist-list" id="edge-dist-list"></ul>
+      </section>
+
+      <section class="panel-section route-card">
+        <h2>ルート</h2>
+        <p class="route-summary" id="route-summary">未作成</p>
+        <ul class="saved-list" id="saved-list"></ul>
+        <button type="button" id="btn-share" class="btn btn-share btn-block">テキストをコピー</button>
+        <p class="share-feedback" id="share-feedback" hidden>コピーしました</p>
+      </section>
+    </aside>
+
+    <button type="button" class="panel-toggle glass-pill" id="panel-toggle" aria-expanded="true" aria-controls="control-panel">
+      <span class="sr-only">パネル</span>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+    </button>
+
+    <div class="toast glass-pill" id="toast" role="status" aria-live="polite" hidden></div>
+    <div class="loading-badge glass-pill" id="loading-badge" hidden>取得中…</div>
+
+    <footer class="site-footer glass-panel">
+      <div class="ad-slot" id="ad-slot" aria-label="広告枠">
+        <span class="ad-label">広告</span>
+        <div class="ad-placeholder">Advertisement</div>
+      </div>
+      <nav class="footer-nav" aria-label="フッターリンク">
+        <a href="howto.html">遊び方</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="https://forms.gle/btfuXnhQQz9ByiVd7" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+      </nav>
+      <p class="footer-copy">© チェーン店クエスト</p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/stores.js"></script>
+  <script src="js/overpass.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

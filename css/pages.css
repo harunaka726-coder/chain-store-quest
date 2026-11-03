@@ -1,0 +1,78 @@
+:root {
+  --ink: #1a1f2c;
+  --ink-soft: #5c6578;
+  --accent: #3b82f6;
+  --bg: #f3f5f8;
+  --font: "Manrope", "Noto Sans JP", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body.page {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--ink);
+  background:
+    radial-gradient(900px 420px at 10% -10%, #e8f2ff, transparent 55%),
+    var(--bg);
+}
+
+.page-header, .page-main, .page-footer {
+  width: min(720px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.page-header {
+  padding: 28px 0 12px;
+}
+.page-header h1 {
+  margin: 12px 0 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+.back {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.page-main {
+  padding: 12px 0 48px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 22px;
+  padding: 24px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(30, 50, 90, 0.08);
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 12px;
+  line-height: 1.6;
+}
+.note, .prose p {
+  color: var(--ink-soft);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+.prose h2 {
+  margin-top: 1.6em;
+  font-size: 1.05rem;
+}
+.prose a { color: var(--accent); }
+
+.page-footer {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0 32px;
+  font-size: 0.85rem;
+}
+.page-footer a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.page-footer a:hover { color: var(--accent); }

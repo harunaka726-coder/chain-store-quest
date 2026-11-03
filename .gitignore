@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.vercel
+node_modules/
+.idea/
+.vscode/
+*.log
