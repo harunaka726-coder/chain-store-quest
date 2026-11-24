@@ -67,6 +67,8 @@ body.page {
 
 .page-footer {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 16px;
   padding: 8px 0 32px;
   font-size: 0.85rem;
@@ -76,3 +78,9 @@ body.page {
   text-decoration: none;
 }
 .page-footer a:hover { color: var(--accent); }
+.page-footer .footer-copy {
+  margin: 0;
+  width: 100%;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
